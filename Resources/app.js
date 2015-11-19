@@ -1,3 +1,3 @@
 !function(){
-	require('ui/main');
+	require('ui/main')();
 };
