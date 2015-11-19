@@ -1,6 +1,10 @@
-var Maps = require('ti.map');
+var Map = require('ti.map');
+
 module.exports = function() {
-	var $ = Ti.UI.createWindow();
+	var $ = Ti.UI.createWindow({
+		title : 'RefugeeMaps for Hamburg',
+		exitOnClose : true
+	});
 	$.addEventListener('open', function() {
 		$.map = Map.createView({
 			region : {
@@ -12,9 +16,9 @@ module.exports = function() {
 			}
 		});
 		$.add($.map);
-		var adapter = require('adapters/repmaps')();
+		var adapter = require('adapters/refmaps')();
 		adapter.OK = function(markers) {
-			
+
 		};
 	});
 	$.open();

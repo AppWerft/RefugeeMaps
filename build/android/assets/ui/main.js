@@ -1,0 +1,1 @@
+var Map=require("ti.map");module.exports=function(){var a=Ti.UI.createWindow({title:"RefugeeMaps for Hamburg",exitOnClose:!0});a.addEventListener("open",function(){a.map=Map.createView({region:{latitude:53.553,longitude:10,latitudeDelta:.1,longitudeDelta:.1,enableZoomControls:!1}}),a.add(a.map);var e=require("adapters/refmaps")();e.OK=function(){}}),a.open()};

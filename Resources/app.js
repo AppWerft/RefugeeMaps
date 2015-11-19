@@ -1,3 +1,4 @@
-!function(){
+!function() {
 	require('ui/main')();
-};
+}();
+

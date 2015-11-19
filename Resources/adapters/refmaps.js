@@ -20,7 +20,7 @@ module.exports = function() {
 		},
 		onerror : callbackFn
 	});
-	$.open(GET, URL);
+	$.open('GET', URL);
 	$.send();
 	return $;
 };
