@@ -1,6 +1,6 @@
 {
-	"target": "device",
-	"deployType": "test",
+	"target": "dist-playstore",
+	"deployType": "production",
 	"classname": "Refugeemaps",
 	"platformPath": "/Library/Application Support/Titanium/mobilesdk/osx/4.0.0.GA/android",
 	"modulesHash": "764f1da7205d115e85fa9e353e6585f4",
@@ -8,12 +8,13 @@
 	"modulesNativeHash": "82ce3e2582fa266effb4542a1a4c69f1",
 	"modulesBindingsHash": "faf7fa49ba21fb88f723c4790c2cd6c3",
 	"gitHash": "9239ff9",
+	"outputDir": "/Users/fuerst/Documents/Appcelerator_Studio_Workspace/RefugeeMaps",
 	"name": "RefugeeMaps",
 	"id": "de.appwerft.refugeemaps",
 	"analytics": true,
 	"publisher": "fuerst",
-	"version": "1.0",
-	"description": "",
+	"version": "1.0.2",
+	"description": "undefined",
 	"copyright": "2015 by fuerst",
 	"guid": "dd5073f2-aa8d-4da4-9ddd-5e338bb7e659",
 	"icon": "appicon.png",
@@ -23,9 +24,9 @@
 	"encryptJS": true,
 	"minSDK": 14,
 	"targetSDK": 21,
-	"propertiesHash": "06e83b0aa59254699105154f2bce7f85",
+	"propertiesHash": "30c8342e81896b8a43ef49ef66db3d3b",
 	"activitiesHash": "d41d8cd98f00b204e9800998ecf8427e",
 	"servicesHash": "d41d8cd98f00b204e9800998ecf8427e",
 	"jssFilesHash": "d41d8cd98f00b204e9800998ecf8427e",
-	"jarLibHash": "d2451485c4e34c17c214a72f71c67635"
+	"jarLibHash": "80f1fae80db981d9829b26dd17b71b2b"
 }
