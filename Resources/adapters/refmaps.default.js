@@ -389,7 +389,7 @@ exports.markers = [{
 	"position" : {
 		"lat" : 53.5580553,
 		"lng" : 9.9673117
-	},
+	},   
 	"translations" : [{
 		"language" : "english",
 		"text" : "Refugee Welcome Café with free WIFI, tea and coffee"
