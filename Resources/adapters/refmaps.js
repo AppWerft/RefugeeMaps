@@ -7,7 +7,13 @@ if (!Ti.App.Properties.hasProperty('MARKERS')) {
 	Ti.App.Properties.setString('MARKERS', JSON.stringify(refmaps));
 }
 
-module.exports = function(OKFn) {
+var GeoTools =require('vendor/georoute').createGeo();
+
+exports.sortByDistanceToOwnPosition = function(_markerdata,_cb) {
+	cb(_markerdata);
+};
+
+exports.getPOIs = function(OKFn) {
 	function callbackFn() {
 		if (OKFn) 
 			OKFn(JSON.parse(Ti.App.Properties.getString('MARKERS')));
@@ -18,7 +24,6 @@ module.exports = function(OKFn) {
 		console.log('Warning: offline => we use old markers');
 		callbackFn();
 	}
-
 	var $ = Ti.Network.createHTTPClient({
 		onload : function() {
 			console.log('Info: online => we use fresh markers');

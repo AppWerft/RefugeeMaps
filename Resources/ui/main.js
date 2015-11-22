@@ -1,5 +1,6 @@
 var Map = require('ti.map');
 // find . -type f -name "*.png" -exec convert {} -strip {} \;
+var Adapter= require('adapters/refmaps');
 
 module.exports = function() {
 	var $ = Ti.UI.createWindow({
@@ -8,7 +9,6 @@ module.exports = function() {
 		backgroundColor : 'white',
 		theme : 'Theme.NoActionBar'
 	});
-
 	$.addEventListener('open', function() {
 		$.activity.actionBar.hide();
 		$.map = Map.createView({
@@ -20,7 +20,10 @@ module.exports = function() {
 
 			},
 			enableZoomControls : false,
-			compassEnabled : false
+			compassEnabled : false,
+			userLocation:true,
+			userLocationButton:false,
+			
 		});
 		$.list = Ti.UI.createView({
 			top : 50,
@@ -32,7 +35,8 @@ module.exports = function() {
 		$.add(Ti.UI.createScrollableView({
 			views : [$.map, $.list]
 		}));
-		var adapter = require('adapters/refmaps')(function(markerdata) {
+		
+		Adapter.getPOIs(function(markerdata) {
 			$.map.addAnnotations(markerdata.map(function(marker) {
 				return Map.createAnnotation({
 					latitude : marker.position.lat,
@@ -42,48 +46,10 @@ module.exports = function() {
 					image : '/images/' + marker.category + '.png'
 				});
 			}));
-			var rows = markerdata.map(function(marker) {
-
-				var row = Ti.UI.createTableViewRow({
-					height : Ti.UI.SIZE
-				});
-
-				row.add(Ti.UI.createImageView({
-					left : 5,
-					top : 5,
-					width : 30,
-					height : 40,
-					image : '/assets/' + marker.category + '.png'
-				}));
-				row.add(Ti.UI.createView({
-					left : 60,
-					top : 5,
-					width : Ti.UI.FILL,
-					height : Ti.UI.SIZE,
-					layout : 'vertical'
-				}));
-				row.children[1].add(Ti.UI.createLabel({
-					top : 0,
-					textAlign : 'left',
-					width : Ti.UI.FILL,
-					text : marker.name,
-					color : '#777',
-					font : {
-						fontSize : 22,
-						fontWeight : 'bold'
-					}
-				}));
-				row.children[1].add(Ti.UI.createLabel({
-					top : 0,
-					width : Ti.UI.FILL,
-					textAlign : 'left',
-					text : marker.address,
-					color : '#333'
-				}));
-				return row;
+			Adapter.sortByDistanceToOwnPosition(markerdata,function(sortedmarkerdata){
+				$.list.children[0].setData(sortedmarkerdata.map(require('ui/row')));
 			});
-
-			$.list.children[0].setData(rows);
+			
 		});
 		$.add(Ti.UI.createView({
 			top : 0,
@@ -113,7 +79,6 @@ module.exports = function() {
 			 $.children[1].children[0].backgroundImage=  _e.source.currentPage == 0 ? '/assets/map.png' : '/assets/list.png';
 		});
 	});
-
 	$.addEventListener("android:back", function(_e) {
 		_e.cancelBubble = true;
 		var intent = Ti.Android.createIntent({
@@ -125,7 +90,7 @@ module.exports = function() {
 		return false;
 	});
 	Ti.Gesture.addEventListener('orientationchange', function() {
-		$.children[1].setTop(Ti.Platform.displayCaps.platformHeight > Ti.Platform.displayCaps.platformWidth ? 0 : -50);
+		$.children[1] && $.children[1].setTop(Ti.Platform.displayCaps.platformHeight > Ti.Platform.displayCaps.platformWidth ? 0 : -50);
 	});
 	$.open();
 };
