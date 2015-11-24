@@ -26,10 +26,23 @@ exports.sortByDistanceToOwnPosition = function(_markerdata, _onPosition, _onAddr
 
 exports.getPOIs = function(OKFn) {
 	function callbackFn() {
+		var markers = JSON.parse(Ti.App.Properties.getString('MARKERS'));
+		var lastcategories = Ti.App.Properties.getObject('MARKERCATEGORIES', {});
+		var categories = {};
+		markers.forEach(function(marker) {
+			console.log(marker.category);
+			categories[marker.category] = (lastcategories[marker.category] == undefined) ? true : lastcategories[marker.category];
+		});
+		console.log(categories);
+		Ti.App.Properties.setObject('MARKERCATEGORIES', categories);
+		var result = {
+			markers : markers,
+			categories : categories
+		};
 		if (OKFn)
-			OKFn(JSON.parse(Ti.App.Properties.getString('MARKERS')));
-		else if ($.OK)
-			$.OK(JSON.parse(Ti.App.Properties.getString('MARKERS')));
+			OKFn(result);
+		else if ($.OK)	
+			$.OK(result);
 	};
 	if (!Ti.Network.online) {
 		console.log('Warning: offline => we use old markers');

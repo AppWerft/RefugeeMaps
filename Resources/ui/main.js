@@ -3,111 +3,200 @@ var Map = require('ti.map');
 var Adapter = require('adapters/refmaps');
 var Refresher = require('com.rkam.swiperefreshlayout');
 
+function capitalize(s) {
+	return s[0].toUpperCase() + s.slice(1);
+}
+
 module.exports = function() {
 	var $ = Ti.UI.createWindow({
 		title : 'RefugeeMaps for Hamburg',
 		exitOnClose : true,
 		backgroundColor : 'white',
-		theme : 'Theme.NoActionBar'
+
+	});
+	$.map = Map.createView({
+		region : {
+			latitude : 53.553,
+			longitude : 10,
+			latitudeDelta : 0.1,
+			longitudeDelta : 0.1
+
+		},
+		enableZoomControls : false,
+		compassEnabled : false,
+		userLocation : true,
+		userLocationButton : false,
+
+	});
+	$.list = Ti.UI.createView({
+		top : 50
+	});
+	$.list.add(Refresher.createSwipeRefresh({
+		view : Ti.UI.createTableView({
+			top : 50,
+		}),
+		dummy : 'xyz',
+		top : 50
+	}));
+	$.add(Ti.UI.createScrollableView({
+		views : [$.map, $.list]
+	}));
+
+	Adapter.getPOIs(function(_result) {
+		$.markerdata = _result.markers;
+		$.categorydata = _result.categories;
+		$.map.addAnnotations($.markerdata.map(function(marker) {
+			return Map.createAnnotation({
+				latitude : marker.position.lat,
+				longitude : marker.position.lng,
+				title : marker.name,
+				subtitle : marker.translations[0].text,
+				image : '/images/' + marker.category + '.png'
+			});
+		}));
+		Adapter.sortByDistanceToOwnPosition($.markerdata, function(sortedmarkerdata) {
+			$.list.children[0].view.setData(sortedmarkerdata.map(require('ui/row')));
+		}, function(_address) {
+			$.children[1].children[2].text = 'Your position:\n' + _address.street + ' ' + _address.street_number;
+		});
+		$.drawer.removeAllChildren();
+		for (var key in $.categorydata) {
+			var category = $.categorydata[key];
+			var strip = Ti.UI.createView({
+				top : 5,
+				height : 40
+			});
+			strip.add(Ti.UI.createSwitch({
+				right : 10,
+				width : Ti.UI.SIZE,
+				value : category[key] || true,
+				key : key,
+				//	style : Ti.UI.Android.SWITCH_STYLE_TOGGLEBUTTON,
+				top : 5,
+				height : Ti.UI.SIZE
+			}));
+			strip.add(Ti.UI.createImageView({
+				top : 5,
+				touchEnabled : false,
+				left : 5,
+				width : 20,
+				height : 25,
+				image : '/assets/' + key + '.png'
+			}));
+			strip.add(Ti.UI.createLabel({
+				top : 5,
+				height : Ti.UI.SIZE,
+				left : 30,
+				color : '#444',
+				touchEnabled : false,
+				text : capitalize(key)
+			}));
+			$.drawer.add(strip);
+		};
+
+	});
+	$.add(Ti.UI.createView({
+		top : 0,
+		height : 50,
+		backgroundColor : '#6000'
+	}));
+	$.children[1].add(Ti.UI.createButton({
+		backgroundImage : '/assets/list.png',
+		width : 50,
+		height : 50,
+		right : 10
+	}));
+
+	$.children[1].add(Ti.UI.createButton({
+		backgroundImage : '/assets/filter.png',
+		width : 50,
+		height : 50,
+		right : 60
+	}));
+	$.children[1].add(Ti.UI.createLabel({
+		width : Ti.UI.FILL,
+		color : 'white',
+		text : 'Your position:\nunknown',
+		font : {
+			fontWeight : 'bold'
+		},
+		height : Ti.UI.FILL,
+		left : 10
+	}));
+	$.drawer = Ti.UI.createScrollView({
+		layout : 'vertical',
+		scrollType : 'vertical',
+		top : 50,
+		backgroundColor : 'white',
+		left : -200,
+		width : 200,
+		height : Ti.UI.FILL,
+		opacity : 0.96
+	});
+
+	$.add($.drawer);
+	$.drawer.addEventListener('swipe', function(e) {
+		if (e.direction == 'left' || (e.direction == 'right'))
+			$.drawer.animate({
+				left : -200,
+				duration : 100
+			});
+	});
+	$.drawer.addEventListener('change', function(e) {
+		console.log(e.source.key + '=' + e.source.value);
+		var categories = Ti.App.Properties.getObject('MARKERCATEGORIES', {});
+		console.log(categories);
+		categories[e.source.key] = e.source.value;
+		console.log(categories);
+		Ti.App.Properties.setObject('MARKERCATEGORIES', categories);
+
+	});
+	$.children[0].addEventListener('scrollend', function(_e) {
+		$.children[1].children[0].backgroundImage = _e.source.currentPage == 0 ? '/assets/list.png' : '/assets/map.png';
+	});
+	// Pagetype  map|list
+	$.children[1].children[0].addEventListener('singletap', function(_e) {
+		if ($.children[0].currentPage == 0) {
+			$.drawer.animate({
+				left : -200,
+				duration : 100
+			});
+			$.children[0].scrollToView(1);
+		} else {
+			$.children[0].scrollToView(0);
+		}
+	});
+	// Filter
+	$.children[1].children[1].addEventListener('singletap', function(_e) {
+		if ($.drawer.left == 0) {
+			$.drawer.animate({
+				left : -200,
+				duration : 100
+			});
+		} else {
+			$.children[0].scrollToView(0);
+			$.drawer.animate({
+				left : 0,
+				duration : 100
+			});
+		}
+	});
+	$.list.children[0].addEventListener('refreshing', function() {
+		Adapter.sortByDistanceToOwnPosition($.markerdata, function(sortedmarkerdata) {
+			$.list.children[0].setRefreshing(false);
+			$.list.children[0].view.setData(sortedmarkerdata.map(require('ui/row')));
+
+		}, function(_address) {
+			$.children[1].children[2].text = 'Your position:\n' + _address.street + ' ' + _address.street_number;
+		});
+		setTimeout(function() {
+			$.list.children[0].setRefreshing(false);
+		}, 10000);
+
 	});
 	$.addEventListener('open', function() {
 		$.activity.actionBar.hide();
-		$.map = Map.createView({
-			region : {
-				latitude : 53.553,
-				longitude : 10,
-				latitudeDelta : 0.1,
-				longitudeDelta : 0.1
-
-			},
-			enableZoomControls : false,
-			compassEnabled : false,
-			userLocation : true,
-			userLocationButton : false,
-
-		});
-		$.list = Ti.UI.createView({
-			top : 50
-		});
-		$.list.add(Refresher.createSwipeRefresh({
-			view : Ti.UI.createTableView({
-				top : 50,
-			}),
-			dummy : 'xyz',
-			top : 50
-		}));
-
-		$.add(Ti.UI.createScrollableView({
-			views : [$.map, $.list]
-		}));
-
-		Adapter.getPOIs(function(markerdata) {
-			$.markerdata = markerdata;
-			$.map.addAnnotations(markerdata.map(function(marker) {
-				return Map.createAnnotation({
-					latitude : marker.position.lat,
-					longitude : marker.position.lng,
-					title : marker.name,
-					subtitle : marker.translations[0].text,
-					image : '/images/' + marker.category + '.png'
-				});
-			}));
-			Adapter.sortByDistanceToOwnPosition(markerdata, function(sortedmarkerdata) {
-				$.list.children[0].view.setData(sortedmarkerdata.map(require('ui/row')));
-			});
-
-		});
-		$.add(Ti.UI.createView({
-			top : 0,
-			height : 50,
-			backgroundColor : '#6000'
-		}));
-		$.children[1].add(Ti.UI.createButton({
-			backgroundImage : '/assets/list.png',
-			width : 30,
-			height : 30,
-			right : 10
-		}));
-		$.children[1].add(Ti.UI.createLabel({
-			width : Ti.UI.FILL,
-			color:'white',
-			text:'Your position:\nunknown',
-			font: {fontWeight:'bold'},
-			height : Ti.UI.FILL,
-			left : 10
-		}));
-		$.children[1].add(Ti.UI.createButton({
-			backgroundImage : '/assets/filter.png',
-			width : 30,
-			height : 30,
-			right : 70
-		}));
-		$.children[1].children[0].addEventListener('click', function(_e) {
-			if ($.children[0].currentPage == 0) {
-				$.children[0].scrollToView(1);
-			} else {
-				$.children[0].scrollToView(0);
-			}
-		});
-		$.children[0].addEventListener('scrollend', function(_e) {
-			$.children[1].children[0].backgroundImage = _e.source.currentPage == 0 ? '/assets/list.png' : '/assets/map.png';
-		});
-		$.list.children[0].addEventListener('refreshing', function() {
-			console.log('Info: action REFRESH');
-			Adapter.sortByDistanceToOwnPosition($.markerdata, function(sortedmarkerdata) {
-				$.list.children[0].setRefreshing(false);
-				console.log('Info: position sorted');
-				$.list.children[0].view.setData(sortedmarkerdata.map(require('ui/row')));
-				
-			},function(_address){
-				console.log(_address);
-				$.children[1].children[1].text = 'Your position:\n'+_address.street + ' ' + _address.street_number;
-			});
-			setTimeout(function() {
-				$.list.children[0].setRefreshing(false);
-			}, 10000);
-
-		});
+		require('vendor/versionsreminder')();
 	});
 	$.addEventListener("android:back", function(_e) {
 		_e.cancelBubble = true;
@@ -123,5 +212,5 @@ module.exports = function() {
 		$.children[1] && $.children[1].setTop(Ti.Platform.displayCaps.platformHeight > Ti.Platform.displayCaps.platformWidth ? 0 : -50);
 	});
 	$.open();
-	require('vendor/versionsreminder')();
+	
 };

@@ -3,7 +3,7 @@
     <url>http://hamburger-appwerft.de</url>
     <id>de.appwerft.refugeemaps</id>
     <name>RefugeeMaps</name>
-    <version>1.0.5</version>
+    <version>1.0.8</version>
     <publisher>fuerst</publisher>
     <description>no Text</description>
     <copyright>2015 by fuerst</copyright>
@@ -39,8 +39,8 @@
         </plist>
     </ios>
     <android xmlns:android="http://schemas.android.com/apk/res/android">
-        <manifest android:versionCode="105" android:versionName="1.0.5">
-            <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="21"/>
+        <manifest android:versionCode="108" android:versionName="1.0.8">
+            <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="23"/>
             <uses-permission android:name="android.permission.INTERNET"/>
             <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
             <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
@@ -49,7 +49,7 @@
             <uses-permission android:name="de.appwerft.refugeemaps.permission.MAPS_RECEIVE"/>
             <permission
                 android:name="de.appwerft.refugeemaps.permission.MAPS_RECEIVE" android:protectionLevel="signature"/>
-            <application android:largeHeap="true" android:theme="@style/Theme.Refmaps">
+            <application android:theme="@style/Theme.NoActionBar">
                 <meta-data
                     android:name="com.google.android.maps.v2.API_KEY" android:value="AIzaSyCGdzre2Dst3Vnc7XAM_D_QUnrMM_W7KEc"/>
             </application>
@@ -66,6 +66,6 @@
         <target device="iphone">false</target>
         <target device="mobileweb">false</target>
     </deployment-targets>
-    <sdk-version>4.0.0.GA</sdk-version>
+    <sdk-version>5.1.0.GA</sdk-version>
     <property name="appc-app-id" type="string">564de600e301fbde107483c7</property>
 </ti:app>

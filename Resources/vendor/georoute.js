@@ -137,14 +137,16 @@ Module.prototype = {
 		return point;
 	},
 
-	getDistBearing : function(φ1, λ1, φ2, λ2) {
+	getDistBearing : function(_φ1, _λ1, _φ2, _λ2) {
 		const π = Math.PI,
 		    R = 6371000;
 		// distance :
-		var φ1 = φ1.toRadians();
-		var φ2 = φ2.toRadians();
-		var Δφ = (φ2 - φ1).toRadians();
-		var Δλ = (λ2 - λ1).toRadians();
+		var φ1 = _φ1.toRadians();
+		var φ2 = _φ2.toRadians();
+		var λ1 = _λ1.toRadians();
+		var λ2 = _λ2.toRadians();
+		var Δφ = φ2 - φ1;
+		var Δλ = λ2 - λ1;
 		var a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
 		// bearing :
 		var y = Math.sin(λ2 - λ1) * Math.cos(φ2);
@@ -215,22 +217,21 @@ Module.prototype = {
 		xhr.open('GET', url);
 		xhr.send();
 	},
-	getRoute : function(foo,bar,cb) {
+	getRoute : function(foo, bar, cb) {
 		var that = this;
-		var url = 'https://maps.googleapis.com/maps/api/directions/json?language=' + Ti.Locale.getCurrentLanguage() + '&mode=' + Ti.App.Properties.getString('MODE', 'walking') + '&origin=' + foo.latitude + ',' + foo.longitude + '&destination=' + bar.latitude + ',' + bar.longitude+ '&sensor=false';
+		var url = 'https://maps.googleapis.com/maps/api/directions/json?language=' + Ti.Locale.getCurrentLanguage() + '&mode=' + Ti.App.Properties.getString('MODE', 'walking') + '&origin=' + foo.latitude + ',' + foo.longitude + '&destination=' + bar.latitude + ',' + bar.longitude + '&sensor=false';
 		console.log(url);
 		xhr = Ti.Network.createHTTPClient();
 		xhr.error = function(E) {
 			console.log(this.error);
-		},	
-		xhr.onload = function() {
+		}, xhr.onload = function() {
 			var res = JSON.parse(this.responseText);
-			if (cb && typeof cb == 'function' && res.status=='OK') {
+			if (cb && typeof cb == 'function' && res.status == 'OK') {
 				cb(res.routes[0]);
 			}
 		};
 		xhr.open('GET', url);
-	//	xhr.setRequestHeader('Accept', 'application/json');
+		//	xhr.setRequestHeader('Accept', 'application/json');
 		xhr.send();
 	},
 	// standard methods for event/observer pattern
