@@ -7,15 +7,25 @@ if (!Ti.App.Properties.hasProperty('MARKERS')) {
 	Ti.App.Properties.setString('MARKERS', JSON.stringify(refmaps));
 }
 
-var GeoTools =require('vendor/georoute').createGeo();
+var GeoTools = require('vendor/georoute').createGeo();
 
-exports.sortByDistanceToOwnPosition = function(_markerdata,_cb) {
-	cb(_markerdata);
+exports.sortByDistanceToOwnPosition = function(_markerdata, _cb) {
+	GeoTools.getLocation(function(_coords) {
+		_markerdata.forEach(function(marker) {
+			marker.distance = GeoTools.getDistBearing(_coords.latitude, _coords.longitude, marker.position.lat, marker.position.lng).distance;
+			marker.bearing = GeoTools.getDistBearing(_coords.latitude, _coords.longitude, marker.position.lat, marker.position.lng).bearing;
+		});
+		_markerdata.sort(function(a, b) {
+			return a.distance > b.distance ? 1 : -1;
+		});
+		_cb(_markerdata);
+	});
+
 };
 
 exports.getPOIs = function(OKFn) {
 	function callbackFn() {
-		if (OKFn) 
+		if (OKFn)
 			OKFn(JSON.parse(Ti.App.Properties.getString('MARKERS')));
 		else if ($.OK)
 			$.OK(JSON.parse(Ti.App.Properties.getString('MARKERS')));

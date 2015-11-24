@@ -27,12 +27,25 @@ module.exports = function(marker) {
 			fontWeight : 'bold'
 		}
 	}));
+	if (marker.address) {
+		var address = marker.address.split(',');
+		address.pop();
+		address.pop();
+		row.children[1].add(Ti.UI.createLabel({
+			top : 0,
+			width : Ti.UI.FILL,
+			textAlign : 'left',
+			text : address.join(', '),
+			color : '#333'
+		}));
+	}
+	console.log(marker.distance);
 	row.children[1].add(Ti.UI.createLabel({
 		top : 0,
 		width : Ti.UI.FILL,
 		textAlign : 'left',
-		text : marker.address,
-		color : '#333'
+		text : 'Distance: ' + (parseFloat(marker.distance) / 1000).toFixed(2) + ' km',
+		color : '#111',font: {fontWeight:'bold'}
 	}));
 	return row;
 

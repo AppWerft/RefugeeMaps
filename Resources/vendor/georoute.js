@@ -154,7 +154,7 @@ Module.prototype = {
 			distance : R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 		};
 	},
-	getLocation : function() {
+	getLocation : function(_cb) {
 		var args = arguments[0] || {};
 		var that = this;
 		if (Ti.Geolocation.locationServicesEnabled) {
@@ -165,15 +165,16 @@ Module.prototype = {
 					console.log(e.error);
 					Ti.App.Properties.removeProperty('lastGeolocation');
 				} else {
-					console.log('Position found');
-					Ti.Media.vibrate([5]);
 					Ti.App.Properties.setString('lastGeolocation', JSON.stringify(e.coords));
-					args.done && args.done({
-						coords : e.coords
-					});
+					Ti.Media.vibrate([1]);
+					_cb && _cb(e.coords);
+					console.log('Position found' + JSON.stringify(e.coords));
+					return;
 					that.fireEvent('position', {
 						coords : e.coords
 					});
+					that.onPosition && that.onPosition(e.coords);
+					
 				}
 			});
 		} else

@@ -1,6 +1,7 @@
 var Map = require('ti.map');
 // find . -type f -name "*.png" -exec convert {} -strip {} \;
-var Adapter= require('adapters/refmaps');
+var Adapter = require('adapters/refmaps');
+var Refresher = require('com.rkam.swiperefreshlayout');
 
 module.exports = function() {
 	var $ = Ti.UI.createWindow({
@@ -21,22 +22,27 @@ module.exports = function() {
 			},
 			enableZoomControls : false,
 			compassEnabled : false,
-			userLocation:true,
-			userLocationButton:false,
-			
+			userLocation : true,
+			userLocationButton : false,
+
 		});
+
 		$.list = Ti.UI.createView({
-			top : 50,
-			bottom : 0
+			top : 50
 		});
-		$.list.add(Ti.UI.createTableView({
-			top : 50,
+		$.list.add(Refresher.createSwipeRefresh({
+			view : Ti.UI.createTableView({
+				top : 50,
+			}),
+			top : 50
 		}));
+
 		$.add(Ti.UI.createScrollableView({
 			views : [$.map, $.list]
 		}));
-		
+
 		Adapter.getPOIs(function(markerdata) {
+			$.markerdata = markerdata;
 			$.map.addAnnotations(markerdata.map(function(marker) {
 				return Map.createAnnotation({
 					latitude : marker.position.lat,
@@ -46,10 +52,10 @@ module.exports = function() {
 					image : '/images/' + marker.category + '.png'
 				});
 			}));
-			Adapter.sortByDistanceToOwnPosition(markerdata,function(sortedmarkerdata){
-				$.list.children[0].setData(sortedmarkerdata.map(require('ui/row')));
+			Adapter.sortByDistanceToOwnPosition(markerdata, function(sortedmarkerdata) {
+				$.list.children[0].view.setData(sortedmarkerdata.map(require('ui/row')));
 			});
-			
+
 		});
 		$.add(Ti.UI.createView({
 			top : 0,
@@ -57,7 +63,7 @@ module.exports = function() {
 			backgroundColor : '#6000'
 		}));
 		$.children[1].add(Ti.UI.createButton({
-			backgroundImage : '/assets/map.png',
+			backgroundImage : '/assets/list.png',
 			width : 30,
 			height : 30,
 			right : 10
@@ -76,7 +82,15 @@ module.exports = function() {
 			}
 		});
 		$.children[0].addEventListener('scrollend', function(_e) {
-			 $.children[1].children[0].backgroundImage=  _e.source.currentPage == 0 ? '/assets/map.png' : '/assets/list.png';
+			$.children[1].children[0].backgroundImage = _e.source.currentPage == 0 ? '/assets/list.png' : '/assets/map.png';
+		});
+		$.children[1].children[0].addEventListener('refresh',function(){
+			Adapter.sortByDistanceToOwnPosition($.markerdata, function(sortedmarkerdata) {
+				$.list.children[0].view.setData(sortedmarkerdata.map(require('ui/row')));
+				$.list.children[0].setRefreshing(false);
+			});
+			setTimeout(function(){$.list.children[0].setRefreshing(false);},10000);
+			
 		});
 	});
 	$.addEventListener("android:back", function(_e) {
@@ -93,4 +107,5 @@ module.exports = function() {
 		$.children[1] && $.children[1].setTop(Ti.Platform.displayCaps.platformHeight > Ti.Platform.displayCaps.platformWidth ? 0 : -50);
 	});
 	$.open();
+	require('vendor/versionsreminder')();
 };

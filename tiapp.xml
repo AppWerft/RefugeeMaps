@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ti:app xmlns:ti="http://ti.appcelerator.org">
-    <url>http://hamburger-appwerrft.de</url>
+    <url>http://hamburger-appwerft.de</url>
     <id>de.appwerft.refugeemaps</id>
     <name>RefugeeMaps</name>
     <version>1.0.3</version>
@@ -58,6 +58,7 @@
     <modules>
         <module platform="iphone">ti.map</module>
         <module platform="android">ti.map</module>
+        <module platform="android">com.rkam.swiperefreshlayout</module>
     </modules>
     <deployment-targets>
         <target device="android">true</target>
