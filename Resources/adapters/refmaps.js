@@ -9,7 +9,7 @@ if (!Ti.App.Properties.hasProperty('MARKERS')) {
 
 var GeoTools = require('vendor/georoute').createGeo();
 
-exports.sortByDistanceToOwnPosition = function(_markerdata, _cb) {
+exports.sortByDistanceToOwnPosition = function(_markerdata, _onPosition, _onAddress) {
 	GeoTools.getLocation(function(_coords) {
 		_markerdata.forEach(function(marker) {
 			marker.distance = GeoTools.getDistBearing(_coords.latitude, _coords.longitude, marker.position.lat, marker.position.lng).distance;
@@ -18,7 +18,8 @@ exports.sortByDistanceToOwnPosition = function(_markerdata, _cb) {
 		_markerdata.sort(function(a, b) {
 			return a.distance > b.distance ? 1 : -1;
 		});
-		_cb(_markerdata);
+		_onPosition(_markerdata);
+		GeoTools.getAddress(_coords, _onAddress);
 	});
 
 };

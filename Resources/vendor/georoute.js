@@ -170,11 +170,6 @@ Module.prototype = {
 					_cb && _cb(e.coords);
 					console.log('Position found' + JSON.stringify(e.coords));
 					return;
-					that.fireEvent('position', {
-						coords : e.coords
-					});
-					that.onPosition && that.onPosition(e.coords);
-					
 				}
 			});
 		} else
@@ -199,7 +194,6 @@ Module.prototype = {
 	},
 	getAddress : function(_coords, _load) {
 		var url = 'https://maps.googleapis.com/maps/api/geocode/json?&sensor=true&latlng=' + _coords.latitude + ',' + _coords.longitude;
-		console.log(url);
 		xhr = Ti.Network.createHTTPClient();
 		xhr.onload = function() {
 			//try {
@@ -231,7 +225,6 @@ Module.prototype = {
 		},	
 		xhr.onload = function() {
 			var res = JSON.parse(this.responseText);
-			console.log(res.routes[0]);
 			if (cb && typeof cb == 'function' && res.status=='OK') {
 				cb(res.routes[0]);
 			}

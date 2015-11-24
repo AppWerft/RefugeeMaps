@@ -26,7 +26,6 @@ module.exports = function() {
 			userLocationButton : false,
 
 		});
-
 		$.list = Ti.UI.createView({
 			top : 50
 		});
@@ -34,6 +33,7 @@ module.exports = function() {
 			view : Ti.UI.createTableView({
 				top : 50,
 			}),
+			dummy : 'xyz',
 			top : 50
 		}));
 
@@ -68,6 +68,14 @@ module.exports = function() {
 			height : 30,
 			right : 10
 		}));
+		$.children[1].add(Ti.UI.createLabel({
+			width : Ti.UI.FILL,
+			color:'white',
+			text:'Your position:\nunknown',
+			font: {fontWeight:'bold'},
+			height : Ti.UI.FILL,
+			left : 10
+		}));
 		$.children[1].add(Ti.UI.createButton({
 			backgroundImage : '/assets/filter.png',
 			width : 30,
@@ -84,13 +92,21 @@ module.exports = function() {
 		$.children[0].addEventListener('scrollend', function(_e) {
 			$.children[1].children[0].backgroundImage = _e.source.currentPage == 0 ? '/assets/list.png' : '/assets/map.png';
 		});
-		$.children[1].children[0].addEventListener('refresh',function(){
+		$.list.children[0].addEventListener('refreshing', function() {
+			console.log('Info: action REFRESH');
 			Adapter.sortByDistanceToOwnPosition($.markerdata, function(sortedmarkerdata) {
-				$.list.children[0].view.setData(sortedmarkerdata.map(require('ui/row')));
 				$.list.children[0].setRefreshing(false);
+				console.log('Info: position sorted');
+				$.list.children[0].view.setData(sortedmarkerdata.map(require('ui/row')));
+				
+			},function(_address){
+				console.log(_address);
+				$.children[1].children[1].text = 'Your position:\n'+_address.street + ' ' + _address.street_number;
 			});
-			setTimeout(function(){$.list.children[0].setRefreshing(false);},10000);
-			
+			setTimeout(function() {
+				$.list.children[0].setRefreshing(false);
+			}, 10000);
+
 		});
 	});
 	$.addEventListener("android:back", function(_e) {
