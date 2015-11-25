@@ -17,6 +17,7 @@ module.exports = function() {
 		backgroundColor : 'white',
 
 	});
+	$.overlays = {};
 	$.map = Map.createView({
 		region : {
 			latitude : 53.553,
@@ -63,6 +64,12 @@ module.exports = function() {
 		height : 50,
 		right : 60
 	}));
+	$.children[1].add(Ti.UI.createButton({
+		backgroundImage : '/assets/lang.png',
+		width : 50,
+		height : 50,
+		right : 110
+	}));
 	$.children[1].add(Ti.UI.createLabel({
 		width : Ti.UI.FILL,
 		color : 'white',
@@ -98,13 +105,11 @@ module.exports = function() {
 		Adapter.sortByDistanceToOwnPosition($.markerdata, function(sortedmarkerdata) {
 			$.list.children[0].view.setData(sortedmarkerdata.map(require('ui/row')));
 		}, function(_address) {
-			$.children[1].children[2].text = 'Your position:\n' + _address.street + ' ' + _address.street_number;
+			$.children[1].children[3].text = 'Your position:\n' + _address.street + ' ' + _address.street_number;
 		});
 		$.drawer && $.drawer.removeAllChildren();
-		console.log('CATEGORIES');
 		for (var key in $.categorydata) {
 			var selected = $.categorydata[key];
-			console.log(key + '=' + selected);
 			var strip = Ti.UI.createView({
 				top : 5,
 				height : 32
@@ -126,6 +131,7 @@ module.exports = function() {
 				height : 25,
 				image : '/assets/' + key + '.png'
 			}));
+
 			strip.add(Ti.UI.createLabel({
 				top : 5,
 				height : Ti.UI.SIZE,
@@ -151,7 +157,7 @@ module.exports = function() {
 	$.drawer.addEventListener('change', function(e) {
 		if (e.source.key == 'freewifi') {
 			if (e.source.value === false) {
-				$.FreifunkOverlay && $.FreifunkOverlay.destroy();
+				$.overlays.freewifi && $.overlays.freewifi.destroy();
 			} else {
 				Freifunk(function(res) {
 					if (!Array.isArray(res.nodes))
@@ -165,7 +171,7 @@ module.exports = function() {
 							image : p.online ? '/images/freifunk.png' : '/images/freifunk_.png'
 						};
 					});
-					$.FreifunkOverlay = new MarkerManager({
+					$.overlays.freewifi = new MarkerManager({
 						maxannotations : 120,
 						points : points,
 						map : $.map // reference to mapview
@@ -210,6 +216,8 @@ module.exports = function() {
 			});
 		}
 	});
+	$.children[1].children[2].addEventListener('singletap', require('ui/langdialog'));
+
 	$.list.children[0].addEventListener('refreshing', function() {
 		Adapter.sortByDistanceToOwnPosition($.markerdata, function(sortedmarkerdata) {
 			$.list.children[0].setRefreshing(false);
@@ -237,7 +245,7 @@ module.exports = function() {
 					image : p.online ? '/images/freifunk.png' : '/images/freifunk_.png'
 				};
 			});
-			$.FreifunkOverlay = new MarkerManager({
+			$.overlays.freewifi = new MarkerManager({
 				maxannotations : 120,
 				points : points,
 				map : $.map // reference to mapview
