@@ -7,6 +7,9 @@ function capitalize(s) {
 	return s[0].toUpperCase() + s.slice(1);
 }
 
+var Freifunk = require('adapters/freifunk');
+var MarkerManager = require('vendor/markermanager');
+
 module.exports = function() {
 	var $ = Ti.UI.createWindow({
 		title : 'RefugeeMaps for Hamburg',
@@ -42,59 +45,6 @@ module.exports = function() {
 		views : [$.map, $.list]
 	}));
 
-	Adapter.getPOIs(function(_result) {
-		$.markerdata = _result.markers;
-		$.categorydata = _result.categories;
-		$.map.addAnnotations($.markerdata.map(function(marker) {
-			return Map.createAnnotation({
-				latitude : marker.position.lat,
-				longitude : marker.position.lng,
-				title : marker.name,
-				subtitle : marker.translations[0].text,
-				image : '/images/' + marker.category + '.png'
-			});
-		}));
-		Adapter.sortByDistanceToOwnPosition($.markerdata, function(sortedmarkerdata) {
-			$.list.children[0].view.setData(sortedmarkerdata.map(require('ui/row')));
-		}, function(_address) {
-			$.children[1].children[2].text = 'Your position:\n' + _address.street + ' ' + _address.street_number;
-		});
-		$.drawer.removeAllChildren();
-		for (var key in $.categorydata) {
-			var category = $.categorydata[key];
-			var strip = Ti.UI.createView({
-				top : 5,
-				height : 40
-			});
-			strip.add(Ti.UI.createSwitch({
-				right : 10,
-				width : Ti.UI.SIZE,
-				value : category[key] || true,
-				key : key,
-				//	style : Ti.UI.Android.SWITCH_STYLE_TOGGLEBUTTON,
-				top : 5,
-				height : Ti.UI.SIZE
-			}));
-			strip.add(Ti.UI.createImageView({
-				top : 5,
-				touchEnabled : false,
-				left : 5,
-				width : 20,
-				height : 25,
-				image : '/assets/' + key + '.png'
-			}));
-			strip.add(Ti.UI.createLabel({
-				top : 5,
-				height : Ti.UI.SIZE,
-				left : 30,
-				color : '#444',
-				touchEnabled : false,
-				text : capitalize(key)
-			}));
-			$.drawer.add(strip);
-		};
-
-	});
 	$.add(Ti.UI.createView({
 		top : 0,
 		height : 50,
@@ -133,6 +83,61 @@ module.exports = function() {
 		height : Ti.UI.FILL,
 		opacity : 0.96
 	});
+	Adapter.getPOIs(function(_result) {
+		$.markerdata = _result.markers;
+		$.categorydata = _result.categories;
+		$.map.addAnnotations($.markerdata.map(function(marker) {
+			return Map.createAnnotation({
+				latitude : marker.position.lat,
+				longitude : marker.position.lng,
+				title : marker.name,
+				subtitle : marker.translations[0].text,
+				image : '/images/' + marker.category + '.png'
+			});
+		}));
+		Adapter.sortByDistanceToOwnPosition($.markerdata, function(sortedmarkerdata) {
+			$.list.children[0].view.setData(sortedmarkerdata.map(require('ui/row')));
+		}, function(_address) {
+			$.children[1].children[2].text = 'Your position:\n' + _address.street + ' ' + _address.street_number;
+		});
+		$.drawer && $.drawer.removeAllChildren();
+		console.log('CATEGORIES');
+		for (var key in $.categorydata) {
+			var selected = $.categorydata[key];
+			console.log(key + '=' + selected);
+			var strip = Ti.UI.createView({
+				top : 5,
+				height : 32
+			});
+			strip.add(Ti.UI.createSwitch({
+				right : 10,
+				width : Ti.UI.SIZE,
+				value : selected !== undefined ? selected : true,
+				key : key,
+				//	style : Ti.UI.Android.SWITCH_STYLE_TOGGLEBUTTON,
+				top : 5,
+				height : Ti.UI.SIZE
+			}));
+			strip.add(Ti.UI.createImageView({
+				top : 5,
+				touchEnabled : false,
+				left : 5,
+				width : 20,
+				height : 25,
+				image : '/assets/' + key + '.png'
+			}));
+			strip.add(Ti.UI.createLabel({
+				top : 5,
+				height : Ti.UI.SIZE,
+				left : 30,
+				color : '#444',
+				touchEnabled : false,
+				text : capitalize(key)
+			}));
+			$.drawer && $.drawer.add(strip);
+		};
+
+	});
 
 	$.add($.drawer);
 	$.drawer.addEventListener('swipe', function(e) {
@@ -142,12 +147,36 @@ module.exports = function() {
 				duration : 100
 			});
 	});
+	// changing of filter
 	$.drawer.addEventListener('change', function(e) {
-		console.log(e.source.key + '=' + e.source.value);
+		if (e.source.key == 'freewifi') {
+			if (e.source.value === false) {
+				$.FreifunkOverlay && $.FreifunkOverlay.destroy();
+			} else {
+				Freifunk(function(res) {
+					if (!Array.isArray(res.nodes))
+						return;
+					var points = res.nodes.map(function(p) {
+						return {
+							lat : p.lat,
+							lng : p.lon,
+							title : 'Free Wifi by Freifunk',
+							subtitle : p.name,
+							image : p.online ? '/images/freifunk.png' : '/images/freifunk_.png'
+						};
+					});
+					$.FreifunkOverlay = new MarkerManager({
+						maxannotations : 120,
+						points : points,
+						map : $.map // reference to mapview
+					});
+				});
+
+			}
+		} else {
+		}
 		var categories = Ti.App.Properties.getObject('MARKERCATEGORIES', {});
-		console.log(categories);
 		categories[e.source.key] = e.source.value;
-		console.log(categories);
 		Ti.App.Properties.setObject('MARKERCATEGORIES', categories);
 
 	});
@@ -196,6 +225,25 @@ module.exports = function() {
 	});
 	$.addEventListener('open', function() {
 		$.activity.actionBar.hide();
+		Freifunk(function(res) {
+			if (!res || !Array.isArray(res.nodes))
+				return;
+			var points = res.nodes.map(function(p) {
+				return {
+					lat : p.lat,
+					lng : p.lon,
+					title : 'Free Wifi by Freifunk',
+					subtitle : p.name,
+					image : p.online ? '/images/freifunk.png' : '/images/freifunk_.png'
+				};
+			});
+			$.FreifunkOverlay = new MarkerManager({
+				maxannotations : 120,
+				points : points,
+				map : $.map // reference to mapview
+			});
+		});
+
 		require('vendor/versionsreminder')();
 	});
 	$.addEventListener("android:back", function(_e) {
@@ -212,5 +260,5 @@ module.exports = function() {
 		$.children[1] && $.children[1].setTop(Ti.Platform.displayCaps.platformHeight > Ti.Platform.displayCaps.platformWidth ? 0 : -50);
 	});
 	$.open();
-	
+
 };

@@ -1,8 +1,6 @@
 const URL = 'http://refugeemaps.eu/_api/hotspots/hamburg.json';
 
 if (!Ti.App.Properties.hasProperty('MARKERS')) {
-	console.log('Info: first start=> we copy markers from Resources');
-
 	var refmaps = require('adapters/refmaps.default').markers;
 	Ti.App.Properties.setString('MARKERS', JSON.stringify(refmaps));
 }
@@ -28,12 +26,12 @@ exports.getPOIs = function(OKFn) {
 	function callbackFn() {
 		var markers = JSON.parse(Ti.App.Properties.getString('MARKERS'));
 		var lastcategories = Ti.App.Properties.getObject('MARKERCATEGORIES', {});
+		//console.log('lastcategories='+ JSON.stringify(lastcategories));
 		var categories = {};
 		markers.forEach(function(marker) {
-			console.log(marker.category);
 			categories[marker.category] = (lastcategories[marker.category] == undefined) ? true : lastcategories[marker.category];
 		});
-		console.log(categories);
+		if (categories.freewifi == undefined) categories.freewifi = true;
 		Ti.App.Properties.setObject('MARKERCATEGORIES', categories);
 		var result = {
 			markers : markers,

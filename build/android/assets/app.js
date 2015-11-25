@@ -1,1 +1,1 @@
-!function(){require("ui/main")()}();
+/Users/fuerst/Documents/APPC_WORKSPACE/RefugeeMaps/Resources/app.js

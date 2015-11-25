@@ -159,8 +159,9 @@ Module.prototype = {
 	getLocation : function(_cb) {
 		var args = arguments[0] || {};
 		var that = this;
-		if (Ti.Geolocation.locationServicesEnabled) {
-			Ti.Geolocation.purpose = args.purpose || 'Deine Position für Routingberechnung';
+		if (Ti.Geolocation.getLocationServicesEnabled()) {
+			Ti.Geolocation.distanceFilter = 15;
+			Ti.Geolocation.purpose = 'Your position for calculation of distance';
 			Ti.Geolocation.getCurrentPosition(function(e) {
 				if (e.error) {
 					Ti.API.error('Error: ' + e.error);
@@ -174,12 +175,21 @@ Module.prototype = {
 					return;
 				}
 			});
-		} else
-			Ti.UI.createAlertDialog({
-				message : 'Um alle Geofunktionen nutzen zu können, muss der Standortdienst eingeschaltet sein.',
-				title : 'Standortdienst gestört …'
-			}).show();
-
+		} else {
+			var dialog = Ti.UI.createAlertDialog({
+				message : 'To show you path to the locations we need your position.',
+				title : 'No Location data …',
+				ok : 'OK'
+			});
+			dialog.show();
+			dialog.addEventListener('click', function(e) {
+				if (e.index >= 0) {
+					Ti.Android.currentActivity.startActivity(Ti.Android.createIntent({
+						action : "android.settings.LOCATION_SOURCE_SETTINGS"
+					}));
+				}
+			});
+		}
 	},
 	getLatLng : function(_address) {
 		var that = this;
