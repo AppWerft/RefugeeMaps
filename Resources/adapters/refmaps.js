@@ -26,7 +26,6 @@ exports.getPOIs = function(OKFn) {
 	function callbackFn() {
 		var markers = JSON.parse(Ti.App.Properties.getString('MARKERS'));
 		var lastcategories = Ti.App.Properties.getObject('MARKERCATEGORIES', {});
-		//console.log('lastcategories='+ JSON.stringify(lastcategories));
 		var categories = {};
 		markers.forEach(function(marker) {
 			categories[marker.category] = (lastcategories[marker.category] == undefined) ? true : lastcategories[marker.category];

@@ -68,7 +68,6 @@ Module.prototype = {
 		for (var i = 0; i < this.points.length; i++)
 			this.points[i].id = i;
 		var t_end = new Date().getTime();
-		console.log('MarkerManger: importData ' + (t_end - t_start) + ' ms.');
 	},
 	_startMap : function() {
 		var region = this.map.getRegion();
@@ -92,7 +91,6 @@ Module.prototype = {
 				array_of_markers_in_range.push(p);
 		});
 		var t_end = new Date().getTime();
-		console.log('MarkerManger: ' + array_of_markers_in_range.length + ' marker found in region (unfiltered)');
 		if (!array_of_markers_in_range.length)
 			return;
 		// grouping in object_of_tiles_with_markers (RASTER in every direction => max. RASTER*RASTER on map)
@@ -126,9 +124,7 @@ Module.prototype = {
 					object_of_tiles_with_markers[key].push(item);
 			});
 
-			console.log('MarkerManger: reduced number of markers ' + tilecounter);
-
-			// compressing:
+				// compressing:
 			var compressed = 0;
 			var t_start = new Date().getTime();
 			for (key in object_of_tiles_with_markers) {
@@ -180,7 +176,6 @@ Module.prototype = {
 		this.map.removeAnnotations(markers.to_remove);
 		this.map.addAnnotations(markers.to_add);
 		var t_end = new Date().getTime();
-		console.log('MarkerManger: rendering time ' + (t_end - t_start) + ' ms.');
 		this.fireEvent('complete');
 	},
 	fireEvent : function(_event, _payload) {

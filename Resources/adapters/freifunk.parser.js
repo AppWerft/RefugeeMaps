@@ -50,9 +50,7 @@ module.exports = function(httpbody) {
 	var allnodes = [];
 	/// XML:
 	// beginnt mit optionalem Leerzeichen und '<'
-	console.log(httpbody.responseText);
 	if (httpbody.responseText.match(/^\s*</mg)) {
-		console.log('PARSERINFO: XML found');
 		var xml = httpbody.responseXML;
 		if (xml.documentElement) {
 			var items = xml.documentElement.getElementsByTagName("router");

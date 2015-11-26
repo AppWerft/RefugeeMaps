@@ -171,7 +171,6 @@ Module.prototype = {
 					Ti.App.Properties.setString('lastGeolocation', JSON.stringify(e.coords));
 					Ti.Media.vibrate([1]);
 					_cb && _cb(e.coords);
-					console.log('Position found' + JSON.stringify(e.coords));
 					return;
 				}
 			});
@@ -230,7 +229,6 @@ Module.prototype = {
 	getRoute : function(foo, bar, cb) {
 		var that = this;
 		var url = 'https://maps.googleapis.com/maps/api/directions/json?language=' + Ti.Locale.getCurrentLanguage() + '&mode=' + Ti.App.Properties.getString('MODE', 'walking') + '&origin=' + foo.latitude + ',' + foo.longitude + '&destination=' + bar.latitude + ',' + bar.longitude + '&sensor=false';
-		console.log(url);
 		xhr = Ti.Network.createHTTPClient();
 		xhr.error = function(E) {
 			console.log(this.error);

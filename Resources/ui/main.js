@@ -9,16 +9,17 @@ function capitalize(s) {
 
 var Freifunk = require('adapters/freifunk');
 var MarkerManager = require('vendor/markermanager');
+var L = require('adapters/L');
 
 module.exports = function() {
 	var $ = Ti.UI.createWindow({
-		title : 'RefugeeMaps for Hamburg',
 		exitOnClose : true,
-		backgroundColor : 'white',
-
+		fullscreen : false,
+		backgroundColor : 'white'
 	});
 	$.overlays = {};
 	$.map = Map.createView({
+		top : 20,
 		region : {
 			latitude : 53.553,
 			longitude : 10,
@@ -33,11 +34,11 @@ module.exports = function() {
 
 	});
 	$.list = Ti.UI.createView({
-		top : 50
+		top : 70
 	});
 	$.list.add(Refresher.createSwipeRefresh({
 		view : Ti.UI.createTableView({
-			top : 50,
+			top : 70,
 		}),
 		dummy : 'xyz',
 		top : 50
@@ -47,7 +48,7 @@ module.exports = function() {
 	}));
 
 	$.add(Ti.UI.createView({
-		top : 0,
+		top : 20,
 		height : 50,
 		backgroundColor : '#6000'
 	}));
@@ -73,7 +74,7 @@ module.exports = function() {
 	$.children[1].add(Ti.UI.createLabel({
 		width : Ti.UI.FILL,
 		color : 'white',
-		text : 'Your position:\nunknown',
+		text : L('yourposition')+':\nunknown',
 		font : {
 			fontWeight : 'bold'
 		},
@@ -83,11 +84,11 @@ module.exports = function() {
 	$.drawer = Ti.UI.createScrollView({
 		layout : 'vertical',
 		scrollType : 'vertical',
-		top : 50,
+		top : 70,
 		backgroundColor : 'white',
 		left : -200,
 		width : 200,
-		height : Ti.UI.FILL,
+		height : 460,
 		opacity : 0.96
 	});
 	Adapter.getPOIs(function(_result) {
@@ -98,14 +99,14 @@ module.exports = function() {
 				latitude : marker.position.lat,
 				longitude : marker.position.lng,
 				title : marker.name,
-				subtitle : marker.translations[0].text,
+				translations : marker.translations,
 				image : '/images/' + marker.category + '.png'
 			});
 		}));
 		Adapter.sortByDistanceToOwnPosition($.markerdata, function(sortedmarkerdata) {
 			$.list.children[0].view.setData(sortedmarkerdata.map(require('ui/row')));
 		}, function(_address) {
-			$.children[1].children[3].text = 'Your position:\n' + _address.street + ' ' + _address.street_number;
+			$.children[1].children[3].text =  L('yourposition')+':\n' + _address.street + ' ' + _address.street_number;
 		});
 		$.drawer && $.drawer.removeAllChildren();
 		for (var key in $.categorydata) {
@@ -138,13 +139,11 @@ module.exports = function() {
 				left : 30,
 				color : '#444',
 				touchEnabled : false,
-				text : capitalize(key)
+				text : L(key)
 			}));
 			$.drawer && $.drawer.add(strip);
 		};
-
 	});
-
 	$.add($.drawer);
 	$.drawer.addEventListener('swipe', function(e) {
 		if (e.direction == 'left' || (e.direction == 'right'))
@@ -217,6 +216,15 @@ module.exports = function() {
 		}
 	});
 	$.children[1].children[2].addEventListener('singletap', require('ui/langdialog'));
+	Ti.App.addEventListener('changed', function(e) {
+		$.drawer.animate({
+			left : -200,
+			duration : 100
+		});
+		Ti.UI.createNotification({
+			message : L('languagechanged')
+		}).show();
+	});
 
 	$.list.children[0].addEventListener('refreshing', function() {
 		Adapter.sortByDistanceToOwnPosition($.markerdata, function(sortedmarkerdata) {
@@ -224,7 +232,7 @@ module.exports = function() {
 			$.list.children[0].view.setData(sortedmarkerdata.map(require('ui/row')));
 
 		}, function(_address) {
-			$.children[1].children[2].text = 'Your position:\n' + _address.street + ' ' + _address.street_number;
+			$.children[1].children[2].text =  L('yourposition')+':\n' + _address.street + ' ' + _address.street_number;
 		});
 		setTimeout(function() {
 			$.list.children[0].setRefreshing(false);
@@ -254,6 +262,17 @@ module.exports = function() {
 
 		require('vendor/versionsreminder')();
 	});
+	$.map.addEventListener('click', function(e) {
+		if (e.clicksource == 'pin' && e.annotation.translations) {
+			var lang = Ti.App.Properties.getString('CURRENTLANG', 'english');
+			console.log(e.annotation.translations);
+			var subtitles = e.annotation.translations.filter(function(t) {
+				return (t.language == lang) ? true : false;
+			});
+
+			e.annotation.subtitle = subtitles[0].text;
+		}
+	});
 	$.addEventListener("android:back", function(_e) {
 		_e.cancelBubble = true;
 		var intent = Ti.Android.createIntent({
@@ -265,7 +284,7 @@ module.exports = function() {
 		return false;
 	});
 	Ti.Gesture.addEventListener('orientationchange', function() {
-		$.children[1] && $.children[1].setTop(Ti.Platform.displayCaps.platformHeight > Ti.Platform.displayCaps.platformWidth ? 0 : -50);
+		$.children[1] && $.children[1].setTop(Ti.Platform.displayCaps.platformHeight > Ti.Platform.displayCaps.platformWidth ? 0 : -70);
 	});
 	$.open();
 

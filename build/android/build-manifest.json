@@ -2,18 +2,18 @@
 	"target": "device",
 	"deployType": "test",
 	"classname": "Refugeemaps",
-	"platformPath": "/Users/fuerst/Library/Application Support/Titanium/mobilesdk/osx/5.1.0.GA/android",
+	"platformPath": "/Users/fuerst/Library/Application Support/Titanium/mobilesdk/osx/5.1.1.GA/android",
 	"modulesHash": "668d839047451894914574ea42c2ebce",
 	"modulesManifestHash": "9bb4d0fac3c0ea20ead2c05408332ba3",
 	"modulesNativeHash": "311fbb0c74d0777c10e6aac7a711a312",
 	"modulesBindingsHash": "1a5598783606d376eadb081b9c5f88c6",
-	"gitHash": "0913213",
+	"gitHash": "e46100b",
 	"name": "RefugeeMaps",
 	"id": "de.appwerft.refugeemaps",
 	"analytics": false,
 	"publisher": "fuerst",
 	"url": "http://hamburger-appwerft.de",
-	"version": "1.1.2",
+	"version": "1.1.4",
 	"description": "no Text",
 	"copyright": "2015 by fuerst",
 	"guid": "dd5073f2-aa8d-4da4-9ddd-5e338bb7e659",
@@ -28,5 +28,5 @@
 	"propertiesHash": "06e83b0aa59254699105154f2bce7f85",
 	"activitiesHash": "d41d8cd98f00b204e9800998ecf8427e",
 	"servicesHash": "d41d8cd98f00b204e9800998ecf8427e",
-	"jarLibHash": "8b20f61eafa842fec22dfd5e2f2b6d2e"
+	"jarLibHash": "a2a512b66f9c9c4b5520bde81bbe8fa1"
 }
