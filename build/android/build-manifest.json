@@ -2,12 +2,12 @@
 	"target": "device",
 	"deployType": "test",
 	"classname": "Refugeemaps",
-	"platformPath": "/Users/fuerst/Library/Application Support/Titanium/mobilesdk/osx/5.1.1.GA/android",
+	"platformPath": "/Users/fuerst/Library/Application Support/Titanium/mobilesdk/osx/4.1.0.GA/android",
 	"modulesHash": "668d839047451894914574ea42c2ebce",
 	"modulesManifestHash": "9bb4d0fac3c0ea20ead2c05408332ba3",
 	"modulesNativeHash": "311fbb0c74d0777c10e6aac7a711a312",
 	"modulesBindingsHash": "1a5598783606d376eadb081b9c5f88c6",
-	"gitHash": "e46100b",
+	"gitHash": "3af50f0",
 	"name": "RefugeeMaps",
 	"id": "de.appwerft.refugeemaps",
 	"analytics": false,
@@ -19,7 +19,6 @@
 	"guid": "dd5073f2-aa8d-4da4-9ddd-5e338bb7e659",
 	"icon": "appicon.png",
 	"fullscreen": true,
-	"navbarHidden": true,
 	"skipJSMinification": true,
 	"mergeCustomAndroidManifest": false,
 	"encryptJS": true,
@@ -28,5 +27,6 @@
 	"propertiesHash": "06e83b0aa59254699105154f2bce7f85",
 	"activitiesHash": "d41d8cd98f00b204e9800998ecf8427e",
 	"servicesHash": "d41d8cd98f00b204e9800998ecf8427e",
-	"jarLibHash": "a2a512b66f9c9c4b5520bde81bbe8fa1"
+	"jssFilesHash": "d41d8cd98f00b204e9800998ecf8427e",
+	"jarLibHash": "c78babd90d123c93f3188ae44b534ed3"
 }

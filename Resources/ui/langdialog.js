@@ -6,7 +6,6 @@ module.exports = function(e) {
 	var currentLanguage = Ti.App.Properties.hasProperty('CURRENTLANG') == true//
 	? Ti.App.Properties.getString('CURRENTLANG') : 'english';
 	var selected = null;
-	console.log('lastlang=' + currentLanguage);
 	if (currentLanguage) {
 		lang.names.forEach(function(l, i) {
 			if (l == currentLanguage)
@@ -23,9 +22,7 @@ module.exports = function(e) {
 					language : lang.names[e.index]
 				});
 			}
-
 		});
 		dialog.show();
 	}
-
 };

@@ -39,7 +39,6 @@ module.exports = function(marker) {
 			color : '#333'
 		}));
 	}
-	console.log(marker.distance);
 	row.children[1].add(Ti.UI.createLabel({
 		top : 0,
 		width : Ti.UI.FILL,

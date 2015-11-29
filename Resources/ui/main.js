@@ -265,7 +265,6 @@ module.exports = function() {
 	$.map.addEventListener('click', function(e) {
 		if (e.clicksource == 'pin' && e.annotation.translations) {
 			var lang = Ti.App.Properties.getString('CURRENTLANG', 'english');
-			console.log(e.annotation.translations);
 			var subtitles = e.annotation.translations.filter(function(t) {
 				return (t.language == lang) ? true : false;
 			});

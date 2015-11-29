@@ -165,7 +165,6 @@ Module.prototype = {
 			Ti.Geolocation.getCurrentPosition(function(e) {
 				if (e.error) {
 					Ti.API.error('Error: ' + e.error);
-					console.log(e.error);
 					Ti.App.Properties.removeProperty('lastGeolocation');
 				} else {
 					Ti.App.Properties.setString('lastGeolocation', JSON.stringify(e.coords));

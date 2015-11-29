@@ -121,7 +121,6 @@ module.exports = function(httpbody) {
 			return null;
 		}
 		if (json.features) {// Rostock
-			console.log('PARSERINFO: has property features');
 			json.features.forEach(function(feature) {
 				allnodes.push({
 					lat : feature.geometry.coordinates[1],
@@ -131,7 +130,6 @@ module.exports = function(httpbody) {
 				});
 			});
 		} else if (json.topo) {// Halle
-			console.log('PARSERINFO: has property topo');
 			Object.getOwnPropertyNames(json.topo).forEach(function(key) {
 				allnodes.push({
 					lat : json.topo[key].latitude,
@@ -141,7 +139,6 @@ module.exports = function(httpbody) {
 				});
 			});
 		} else if (json.rows) {
-			console.log('PARSERINFO: has property rows (Jena/…)');
 			var allnodes = json.rows.map(function(row) {
 				return {
 					name : row.value.hostname,
@@ -151,13 +148,10 @@ module.exports = function(httpbody) {
 				};
 			});
 		} else if (json.nodes) {// Bremen
-			console.log('PARSERINFO: has property nodes => we must decide if array or object');
 			var nodes = json.nodes;
 			if (Array.isArray(nodes)) {
 				//  (Wiesbaden/Basel):
-				console.log('PARSERINFO: has property node array');
 				if (nodes[0].nodeinfo && nodes[0].statistics && nodes[0].flags) {
-					console.log('PARSERINFO: node has property nodeinfo => Frankfurt');
 					nodes.forEach(function(node) {
 						node.nodeinfo.location && allnodes.push({
 							lat : node.nodeinfo.location.latitude,
@@ -170,7 +164,6 @@ module.exports = function(httpbody) {
 					});
 
 				} else if (nodes[0].network || nodes[0].hostname) {// Basel
-					console.log('PARSERINFO: node has property statistics');
 					nodes.forEach(function(node) {
 						if (node.location || node.geo) {
 							allnodes.push({
@@ -184,7 +177,6 @@ module.exports = function(httpbody) {
 						}
 					});
 				} else if (nodes[0].status) {//  Wiesbaden
-					console.log('PARSERINFO: node has status (Wiesbaden…)');
 					nodes.forEach(function(node) {
 						if (node.position) {
 							allnodes.push({
@@ -198,7 +190,6 @@ module.exports = function(httpbody) {
 						}
 					});
 				} else if (nodes[0].flags) {//  Karlsruhe
-					console.log('PARSERINFO: node has flags (Jena/Karlsruhe/…)');
 					nodes.forEach(function(node) {
 						if (node.location || node.geo) {
 							allnodes.push({
@@ -258,7 +249,6 @@ module.exports = function(httpbody) {
 		n.dist = GeoTools.distance(n.lat, n.lon, center.lat, center.lon);
 		avgdist += (n.dist / nodes.length);
 	});
-	console.log('AVGdistance=' + avgdist);
 	nodes.forEach(function(n) {
 		n.reldist = n.dist / avgdist;
 	});
